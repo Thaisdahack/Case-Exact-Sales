@@ -1,65 +1,67 @@
 
+/* queries para apagar tabelas
 DROP TABLE FILME; 
 DROP TABLE GENERO;
 DROP TABLE LOCACAO;
 DROP TABLE USUARIO;
-DROP TABLE FILMELOCACAO;
+DROP TABLE FILMELOCACAO;*/
+
 
 /* Criando a tabela genero*/
 
 CREATE TABLE GENERO (
-     ID INT PRIMARY KEY AUTO_INCREMENT,
-     Nome VARCHAR(100) NOT NULL,
-     DtCriacao DATETIME,
-     Ativo TINYINT NOT NULL
-     );
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(100) NOT NULL,
+    DtCriacao DATETIME,
+    Ativo TINYINT NOT NULL
+);
 
 /* Criando a tabela filme */
 
 CREATE TABLE FILME (
-     ID INT PRIMARY KEY AUTO_INCREMENT,
-     Nome VARCHAR(200) NOT NULL,
-     DtCriacao DATETIME NOT NULL,
-     Ativo TINYINT NOT NULL,
-     GeneroId_FK INT NOT NULL,
-	 FOREIGN KEY (GeneroId_FK) 
-     REFERENCES GENERO(ID)
-     );
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(200) NOT NULL,
+    DtCriacao DATETIME NOT NULL,
+    Ativo TINYINT NOT NULL,
+    GeneroId_FK INT NOT NULL,
+    FOREIGN KEY (GeneroId_FK)
+        REFERENCES GENERO (ID)
+);
 
 /* Criando a tabela usuario*/
 
 CREATE TABLE USUARIO (
-     ID INT PRIMARY KEY AUTO_INCREMENT,
-     Nome VARCHAR(200) NOT NULL,
-     Email VARCHAR(100),
-     CPF VARCHAR(14),
-     Ativo TINYINT NOT NULL
-     );
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(200) NOT NULL,
+    Email VARCHAR(100),
+    CPF VARCHAR(14),
+    Ativo TINYINT NOT NULL
+);
      
 /*Criando a tabela filme_locacao*/
      
 CREATE TABLE FILMELOCACAO (
-     ID INT PRIMARY KEY AUTO_INCREMENT,
-     FilmeId_FK INT NOT NULL,
-	 FOREIGN KEY (FilmeId_FK) 
-     REFERENCES FILME(ID)
-     );
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    FilmeId_FK INT NOT NULL,
+    FOREIGN KEY (FilmeId_FK)
+        REFERENCES FILME (ID)
+);
      
 /*Criando a tabela locacao*/
 
 CREATE TABLE LOCACAO (
-     ID INT PRIMARY KEY AUTO_INCREMENT,
-     FilmeLocacaoId_FK INT NOT NULL,
-     UsuarioId_FK INT NOT NULL,
-     DtLocacao DATETIME NOT NULL,
-     GeneroId_FK INT NOT NULL,
-	 FOREIGN KEY (FilmeLocacaoId_FK) 
-     REFERENCES FILMELOCACAO(ID),
-     FOREIGN KEY (UsuarioId_FK) 
-     REFERENCES USUARIO(ID),
-     FOREIGN KEY (GeneroId_FK)
-     REFERENCES GENERO(ID)
-     );
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    FilmeLocacaoId_FK INT NOT NULL,
+    UsuarioId_FK INT NOT NULL,
+    DtLocacao DATETIME NOT NULL,
+    GeneroId_FK INT NOT NULL,
+    FOREIGN KEY (FilmeLocacaoId_FK)
+        REFERENCES FILMELOCACAO (ID),
+    FOREIGN KEY (UsuarioId_FK)
+        REFERENCES USUARIO (ID),
+    FOREIGN KEY (GeneroId_FK)
+        REFERENCES GENERO (ID)
+);
      
 
 /* Inserindo dados na tabela GENERO - QUESTAO 1.4 */     
@@ -153,37 +155,45 @@ INSERT INTO FILME (ID, Nome, DtCriacao, Ativo, GeneroId_FK) VALUES (1, 'Titanic'
                                                                           (19, 6, 4, '2022-06-05 09:10:12',1),
                                                                           (20, 14, 1, '2022-06-05 09:10:12',1)
                                                                           ;
-        
+ 
 /* 1.6 QUERY PARA BUSCAR TODAS AS LOCAÇOES DESSE MES COM AS COLUNAS: FILME.NOME, 
 GENERO.NOME, LOCAÇAO.DTLOCAÇAO, USUARIO.NOME, USUARIO.EMAIL*/
        
-        SELECT F.NOME AS FILME, G.NOME AS GENERO, LO.DtLocacao AS DATA_DE_LOCAÇAO, 
-        U.NOME AS NOME_USUARIO, U.EMAIL
-        FROM FILME F
-        JOIN GENERO G
-        ON F.GeneroId_FK = G.ID
-        JOIN FILMELOCACAO FL
-        ON FL.FilmeId_FK = f.ID
-        JOIN LOCACAO LO
-        ON FL.ID = LO.FilmeLocacaoId_FK
-        JOIN USUARIO U
-        on lo.UsuarioId_FK = U.ID
-        where month(DtLocacao) = 06;
-        
-/* 1.7 QUERY QUE APRESENTA TODOS OS USUARIOS INATIVOS QUE JA TIVERAM ALGUMA LOCAÇAO, 
-COM AS COLUNAS: USUARIO.NOME, USUARIO.CPF*/
-		
-        SELECT DISTINCT U.NOME, U.CPF, U.ATIVO
-        FROM 
-        USUARIO U
+SELECT 
+    F.NOME AS FILME,
+    G.NOME AS GENERO,
+    LO.DtLocacao AS DATA_DE_LOCAÇAO,
+    U.NOME AS NOME_USUARIO,
+    U.EMAIL
+FROM
+    FILME F
         JOIN
-        LOCACAO LO
-        WHERE U.ATIVO = 0; -- A COLUNA GERA RESULTADOS BOOLEANOS, ENTAO 0 SIGNIFICA INATIVO E 1 ATIVO
+    GENERO G ON F.GeneroId_FK = G.ID
+        JOIN
+    FILMELOCACAO FL ON FL.FilmeId_FK = f.ID
+        JOIN
+    LOCACAO LO ON FL.ID = LO.FilmeLocacaoId_FK
+        JOIN
+    USUARIO U ON lo.UsuarioId_FK = U.ID
+WHERE
+    MONTH(DtLocacao) = 06
+ 
+/* 1.7 QUERY QUE APRESENTA TODOS OS USUARIOS INATIVOS QUE JA TIVERAM ALGUMA LOCAÇAO, 
+COM AS COLUNAS: USUARIO.NOME, USUARIO.CPF */
+
+SELECT DISTINCT
+    U.NOME, U.CPF, U.ATIVO
+FROM
+    USUARIO U
+        JOIN
+    LOCACAO LO
+WHERE
+    U.ATIVO = 0   /*COLUNA GERA RESULTADOS BOOLEANOS, ENTAO 0 SIGNIFICA INATIVO E 1 ATIVO*/
 
 /* 1.8 QUERY QUE APRESENTA OS FILMES ALUGADOS POR USUARIOS QUE CONTEM A LETRA A EM SEU EMAIL,
 COM AS SEGUINTES COLUNAS: FILME.ID, FILME.NOME*/
 
-	SELECT F.ID AS FILME_ID, F.NOME AS FILME_NOME
+	SELECT F.ID AS FILME_ID, F.NOME AS NOME_FILME
     FROM
 	FILME F
     JOIN
@@ -197,15 +207,16 @@ COM AS SEGUINTES COLUNAS: FILME.ID, FILME.NOME*/
     WHERE U.EMAIL LIKE '%a%'
     ;
     
-    /* 1.9 QUERY COM OS FILMES MAIS ALUGADOS, COLUNAS: FILME.NOME, QUANTIDADE DE ALUGUEIS*/
+ /* 1.9 QUERY COM OS FILMES MAIS ALUGADOS, COLUNAS: FILME.NOME, QUANTIDADE DE ALUGUEIS*/
     
-    SELECT f.NOME, count(lo.FilmeLocacaoId_FK) as Quantidade_de_Alugueis
-    FROM FILME F
-    JOIN 
-    FILMELOCACAO FL
-    ON FL.FilmeId_FK = F.ID
-    join
-    locacao lo
-    on lo.FilmeLocacaoId_FK = FL.ID
-    group by lo.FilmeLocacaoId_FK
-    order by Quantidade_de_Alugueis DESC;
+SELECT 
+    f.NOME,
+    COUNT(lo.FilmeLocacaoId_FK) AS Quantidade_de_Alugueis
+FROM
+    FILME F
+        JOIN
+    FILMELOCACAO FL ON FL.FilmeId_FK = F.ID
+        JOIN
+    locacao lo ON lo.FilmeLocacaoId_FK = FL.ID
+GROUP BY lo.FilmeLocacaoId_FK
+ORDER BY Quantidade_de_Alugueis DESC;
